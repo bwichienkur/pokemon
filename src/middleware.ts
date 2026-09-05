@@ -58,5 +58,9 @@ export async function middleware(request: NextRequest) {
 }
 
 export const config = {
-  matcher: ["/admin/:path*", "/account/:path*", "/((?!_next/static|_next/image|favicon.ico).*)"],
+  // Run for application routes, but leave Next internals and public image assets
+  // alone so placeholder and locally uploaded card images are served directly.
+  matcher: [
+    "/((?!_next/static|_next/image|favicon.ico|placeholders/|uploads/|.*\\.(?:svg|png|jpg|jpeg|webp|ico|css|js|map)$).*)",
+  ],
 };
