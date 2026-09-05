@@ -42,4 +42,5 @@ next-env.d.ts
 
 # Local dual-mode data store
 .data/
+/public/uploads/
 tsconfig.tsbuildinfo
