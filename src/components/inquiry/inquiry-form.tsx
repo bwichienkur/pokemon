@@ -12,6 +12,7 @@ import { inquiryFormSchema, type InquiryFormInput } from "@/lib/validations/inqu
 
 export interface InquiryFormProps {
   cardId: string;
+  title?: string;
   user?: { name?: string | null; displayName?: string | null; email?: string | null } | null;
   botToken?: string;
   className?: string;
@@ -123,42 +124,5 @@ function Field({
       {child}
       {error && <p id={`${id}-error`} className="mt-1.5 text-xs font-medium text-destructive" role="alert">{error}</p>}
     </div>
-  );
-}
-"use client";
-
-import { useState } from "react";
-import { toast } from "sonner";
-
-import { submitInquiry } from "@/app/actions/inquiries";
-
-export function InquiryForm({ cardId, title }: { cardId: string; title: string }) {
-  const [pending, setPending] = useState(false);
-  async function action(formData: FormData) {
-    setPending(true);
-    try {
-      const result = await submitInquiry({
-        cardId, name: formData.get("name"), email: formData.get("email"), phone: formData.get("phone"),
-        offerAmount: formData.get("offerAmount"), preferredContactMethod: formData.get("preferredContactMethod"),
-        country: formData.get("country"), postalCode: formData.get("postalCode"), message: formData.get("message"),
-        privacyAgreement: formData.get("privacyAgreement") === "on", website: formData.get("website"),
-      });
-      toast.success(`Inquiry received — reference ${result.referenceNumber}`);
-      (document.getElementById("inquiry-form") as HTMLFormElement | null)?.reset();
-    } catch (error) { toast.error(error instanceof Error ? error.message : "We could not send your inquiry."); }
-    finally { setPending(false); }
-  }
-  return (
-    <form id="inquiry-form" action={action} className="space-y-4">
-      <p className="text-sm leading-6 text-muted-foreground">Ask about <span className="text-foreground">{title.replace(/^DEMO Inventory — /, "")}</span>. A gallery advisor will reply privately.</p>
-      <input name="website" className="hidden" tabIndex={-1} autoComplete="off" />
-      <div className="grid gap-4 sm:grid-cols-2"><input required name="name" placeholder="Your name" className="h-11 border border-border bg-background px-3 text-sm focus:border-gold focus:outline-none" /><input required type="email" name="email" placeholder="Email address" className="h-11 border border-border bg-background px-3 text-sm focus:border-gold focus:outline-none" /></div>
-      <div className="grid gap-4 sm:grid-cols-2"><input name="phone" placeholder="Phone (optional)" className="h-11 border border-border bg-background px-3 text-sm focus:border-gold focus:outline-none" /><input name="offerAmount" inputMode="decimal" placeholder="Offer (optional, USD)" className="h-11 border border-border bg-background px-3 text-sm focus:border-gold focus:outline-none" /></div>
-      <div className="grid gap-4 sm:grid-cols-2"><select name="preferredContactMethod" defaultValue="EMAIL" className="h-11 border border-border bg-background px-3 text-sm"><option value="EMAIL">Email preferred</option><option value="PHONE">Phone preferred</option><option value="EITHER">Either is fine</option></select><input required name="country" placeholder="Country" className="h-11 border border-border bg-background px-3 text-sm focus:border-gold focus:outline-none" /></div>
-      <input name="postalCode" placeholder="Postal code (optional)" className="h-11 w-full border border-border bg-background px-3 text-sm focus:border-gold focus:outline-none" />
-      <textarea required name="message" minLength={20} rows={4} placeholder="Tell us what you would like to know…" className="w-full border border-border bg-background p-3 text-sm focus:border-gold focus:outline-none" />
-      <label className="flex gap-2 text-xs leading-5 text-muted-foreground"><input required name="privacyAgreement" type="checkbox" className="mt-1 accent-gold" />I agree to the Privacy Policy and understand this is an inquiry, not a completed purchase.</label>
-      <button disabled={pending} className="h-11 w-full bg-primary px-5 text-sm font-semibold text-primary-foreground disabled:opacity-50">{pending ? "Sending…" : "Send private inquiry"}</button>
-    </form>
   );
 }

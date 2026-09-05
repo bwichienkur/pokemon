@@ -23,6 +23,10 @@ export interface CatalogFilterOptions {
 export interface CatalogFiltersProps {
   options?: Partial<CatalogFilterOptions>;
   className?: string;
+  /** Backwards-compatible initial values for server-rendered catalog routes. */
+  query?: string;
+  grader?: string;
+  availability?: string;
 }
 
 const defaults: CatalogFilterOptions = {
@@ -202,17 +206,3 @@ function FilterGroup({
       </div>
     </fieldset>
   );
-}
-import Link from "next/link";
-
-export function CatalogFilters({ query = "", grader = "", availability = "" }: { query?: string; grader?: string; availability?: string }) {
-  return (
-    <form className="grid gap-3 border-y border-border py-5 md:grid-cols-[1fr_auto_auto_auto]" action="/cards">
-      <label className="sr-only" htmlFor="q">Search collection</label>
-      <input id="q" name="q" defaultValue={query} placeholder="Search by title, set, or certificate…" className="h-11 border border-border bg-background px-4 text-sm outline-none placeholder:text-muted-foreground focus:border-gold" />
-      <select name="graders" defaultValue={grader} className="h-11 border border-border bg-background px-3 text-sm outline-none focus:border-gold"><option value="">All graders</option><option>PSA</option><option>BGS</option><option>CGC</option><option>TAG</option></select>
-      <select name="availability" defaultValue={availability} className="h-11 border border-border bg-background px-3 text-sm outline-none focus:border-gold"><option value="">All availability</option><option value="AVAILABLE">Available</option><option value="RESERVED">Reserved</option><option value="SOLD">Sold</option></select>
-      <div className="flex gap-3"><button className="h-11 bg-primary px-5 text-sm font-semibold text-primary-foreground">Filter</button><Link href="/cards" className="flex h-11 items-center px-2 text-xs font-bold uppercase tracking-wider text-muted-foreground hover:text-gold">Clear</Link></div>
-    </form>
-  );
-}

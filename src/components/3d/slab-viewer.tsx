@@ -1,7 +1,7 @@
 "use client";
 
 import * as React from "react";
-import { FlipHorizontal2, RotateCcw, SearchMinus, SearchPlus } from "lucide-react";
+import { FlipHorizontal2, Minus, Plus, RotateCcw } from "lucide-react";
 
 import { SlabScene } from "@/components/3d/slab-scene";
 import { Button } from "@/components/ui/button";
@@ -120,7 +120,7 @@ export function SlabViewer({
                 aria-label="Zoom out"
                 disabled={scale <= 0.82}
               >
-                <SearchMinus />
+                <Minus />
               </Button>
               <Button
                 variant="ghost"
@@ -129,7 +129,7 @@ export function SlabViewer({
                 aria-label="Zoom in"
                 disabled={scale >= 1.28}
               >
-                <SearchPlus />
+                <Plus />
               </Button>
             </>
           )}
