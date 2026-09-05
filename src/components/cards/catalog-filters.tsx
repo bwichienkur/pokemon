@@ -206,3 +206,5 @@ function FilterGroup({
       </div>
     </fieldset>
   );
+}
+}
