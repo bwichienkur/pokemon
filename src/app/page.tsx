@@ -34,8 +34,9 @@ export default async function Home() {
         </div>
 
         {/* Readability veil — keeps copy legible without boxing the slab */}
-        <div className="pointer-events-none absolute inset-0 bg-gradient-to-r from-black/80 via-black/45 to-transparent lg:via-black/35" />
-        <div className="pointer-events-none absolute inset-x-0 bottom-0 h-40 bg-gradient-to-t from-black/70 to-transparent" />
+        <div className="pointer-events-none absolute inset-0 bg-gradient-to-r from-black/65 via-black/25 to-transparent lg:from-black/55 lg:via-black/15 lg:to-transparent" />
+        <div className="pointer-events-none absolute inset-x-0 bottom-0 h-36 bg-gradient-to-t from-black/55 to-transparent" />
+        <div className="pointer-events-none absolute inset-x-0 top-0 h-28 bg-gradient-to-b from-black/40 to-transparent" />
 
         <Container className="pointer-events-none relative flex min-h-[calc(100vh-4.5rem)] items-end pb-16 pt-28 sm:items-center sm:pb-20 sm:pt-24">
           <div className="relative z-10 max-w-xl">

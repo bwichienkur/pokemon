@@ -80,7 +80,8 @@ export function HeroSlab({
           backUrl={backUrl}
           enableScrollTilt
           cinematic
-          stageOffset={fullBleed && wideStage ? [1.35, 0.05, 0] : [0, 0, 0]}
+          stageOffset={fullBleed && wideStage ? [0.75, 0.12, 0] : [0, 0, 0]}
+          scale={fullBleed ? 1.12 : 1}
           className={cn("min-h-[28rem]", fullBleed && "min-h-full")}
         />
       ) : (

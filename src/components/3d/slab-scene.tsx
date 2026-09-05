@@ -278,38 +278,38 @@ function SlabModel({
           {cinematic && (
             <>
               <Sparkles
-                count={72}
-                scale={[10, 7, 4]}
-                size={2.6}
-                speed={0.42}
-                opacity={0.55}
+                count={90}
+                scale={[12, 8, 5]}
+                size={3.2}
+                speed={0.48}
+                opacity={0.7}
                 color="#f0d58a"
-                position={[baseX * 0.4, 0.4, 0]}
+                position={[baseX * 0.4, 0.5, 0]}
               />
               <Sparkles
-                count={36}
-                scale={[8, 5, 3]}
-                size={1.4}
-                speed={0.25}
-                opacity={0.35}
+                count={48}
+                scale={[10, 6, 4]}
+                size={1.8}
+                speed={0.28}
+                opacity={0.5}
                 color="#9ec8ff"
-                position={[baseX * 0.4, -0.2, -0.5]}
+                position={[baseX * 0.35, -0.15, -0.4]}
               />
             </>
           )}
-          <mesh rotation={[-Math.PI / 2, 0, 0]} position={[baseX * 0.35, -2.2 + baseY, baseZ]}>
-            <planeGeometry args={[16, 14]} />
+          <mesh rotation={[-Math.PI / 2, 0, 0]} position={[baseX * 0.25, -2.05 + baseY, baseZ]}>
+            <planeGeometry args={[18, 16]} />
             <MeshReflectorMaterial
-              blur={[220, 80]}
-              resolution={cinematic ? 768 : 256}
-              mixBlur={0.5}
-              mixStrength={cinematic ? 0.72 : 0.25}
-              roughness={0.78}
-              depthScale={0.7}
-              minDepthThreshold={0.3}
-              maxDepthThreshold={1.2}
-              color="#06080d"
-              metalness={0.5}
+              blur={[240, 90]}
+              resolution={cinematic ? 1024 : 256}
+              mixBlur={0.45}
+              mixStrength={cinematic ? 0.95 : 0.25}
+              roughness={0.7}
+              depthScale={0.85}
+              minDepthThreshold={0.25}
+              maxDepthThreshold={1.15}
+              color="#0a0d14"
+              metalness={0.55}
             />
           </mesh>
         </>
@@ -383,7 +383,7 @@ export function SlabScene({
         <Canvas
           dpr={simplify ? [1, 1.25] : cinematic ? [1, 2] : [1, 1.75]}
           frameloop={cinematic && !simplify ? "always" : "demand"}
-          camera={{ position: [0, 0.15, cinematic ? 5.4 : 6.3], fov: cinematic ? 30 : 34 }}
+          camera={{ position: [0, 0.2, cinematic ? 4.85 : 6.3], fov: cinematic ? 28 : 34 }}
           gl={{
             antialias: !simplify,
             alpha: true,
