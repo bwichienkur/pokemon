@@ -22,23 +22,23 @@ export default async function Home() {
 
   return (
     <div className="overflow-hidden">
-      <section className="relative min-h-[calc(100vh-4.5rem)] border-b border-border">
+      <section className="relative h-[calc(100svh-4.5rem)] min-h-[36rem] overflow-hidden border-b border-border">
         {/* Full-bleed WebGL stage — dominant visual plane */}
         <div className="absolute inset-0">
           <HeroSlab
             card={hero}
             fullBleed
             hideCaption
-            className="h-full min-h-[calc(100vh-4.5rem)]"
+            className="h-full min-h-0"
           />
         </div>
 
         {/* Readability veil — keeps copy legible without boxing the slab */}
         <div className="pointer-events-none absolute inset-0 bg-gradient-to-r from-black/65 via-black/25 to-transparent lg:from-black/55 lg:via-black/15 lg:to-transparent" />
-        <div className="pointer-events-none absolute inset-x-0 bottom-0 h-36 bg-gradient-to-t from-black/55 to-transparent" />
+        <div className="pointer-events-none absolute inset-x-0 bottom-0 h-36 bg-gradient-to-t from-background via-background/70 to-transparent" />
         <div className="pointer-events-none absolute inset-x-0 top-0 h-28 bg-gradient-to-b from-black/40 to-transparent" />
 
-        <Container className="pointer-events-none relative flex min-h-[calc(100vh-4.5rem)] items-end pb-16 pt-28 sm:items-center sm:pb-20 sm:pt-24">
+        <Container className="pointer-events-none relative flex h-full items-end pb-16 pt-28 sm:items-center sm:pb-20 sm:pt-24">
           <div className="relative z-10 max-w-xl">
             <p className="mb-4 font-display text-3xl tracking-tight text-gold sm:text-4xl">
               Atelier Graded
