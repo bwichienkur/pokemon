@@ -42,11 +42,12 @@ export async function bulkCardsAction(input: unknown) {
       : action === "MARK_AVAILABLE" ? { availabilityStatus: "AVAILABLE" as const }
       : action === "MARK_RESERVED" ? { availabilityStatus: "RESERVED" as const }
       : { availabilityStatus: "SOLD" as const };
-    await Promise.all(cardIds.map((cardId) =>
-      "availabilityStatus" in changes
-        ? transitionInventory(cardId, changes.availabilityStatus, admin.id)
-        : updateCard(cardId, changes, admin.id),
-    ));
+    await Promise.all(cardIds.map((cardId) => {
+      const status = changes.availabilityStatus;
+      return status
+        ? transitionInventory(cardId, status, admin.id)
+        : updateCard(cardId, changes, admin.id);
+    }));
   }
   revalidatePath("/admin/cards"); revalidatePath("/cards");
   return { ok: true };

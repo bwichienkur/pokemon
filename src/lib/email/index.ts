@@ -124,7 +124,7 @@ export async function sendInquiryAdminNotification(
     text: `${details}\n\nReview inquiry: ${inquiryUrl}`,
     html: `<h1>New inquiry</h1><p><strong>${escapeHtml(card.title)}</strong> (${escapeHtml(
       card.grader,
-    )} ${escapeHtml(card.grade)})</p><p><strong>Buyer:</strong> ${escapeHtml(
+    )} ${escapeHtml(String(card.grade))})</p><p><strong>Buyer:</strong> ${escapeHtml(
       inquiry.name,
     )} &lt;${escapeHtml(inquiry.email)}&gt;</p><p><strong>Preferred contact:</strong> ${escapeHtml(
       inquiry.preferredContactMethod,
@@ -147,7 +147,7 @@ export async function sendInquiryBuyerConfirmation(
     html: `<h1>Thank you for your inquiry</h1><p>We received your inquiry about <strong>${escapeHtml(
       card.title,
     )}</strong> (${escapeHtml(card.grader)} ${escapeHtml(
-      card.grade,
+      String(card.grade),
     )}). A member of our team will be in touch soon.</p><p><a href="${cardUrl}">View the card</a></p><p>${escapeHtml(
       BRAND_NAME,
     )}<br>${escapeHtml(SITE_TAGLINE)}</p>`,

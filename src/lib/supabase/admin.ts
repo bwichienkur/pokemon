@@ -10,7 +10,9 @@ let adminClient: ReturnType<typeof createClient> | undefined;
  * Returns the privileged service-role client. This must only be used in
  * trusted server code and never exposed to a browser bundle.
  */
-export function createAdminClient(): ReturnType<typeof createClient> {
+// The project intentionally has no generated Supabase Database type yet.
+// Keep the privileged repository adapter flexible until generation is added.
+export function createAdminClient(): any {
   if (
     !env.isSupabaseConfigured ||
     !env.NEXT_PUBLIC_SUPABASE_URL ||
