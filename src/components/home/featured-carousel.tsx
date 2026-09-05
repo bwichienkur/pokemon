@@ -30,10 +30,11 @@ export function FeaturedCarousel({ cards, userId, favoriteCardIds, className }: 
 
   React.useEffect(() => {
     if (!emblaApi) return;
-    updateControls();
+    const frame = requestAnimationFrame(() => updateControls());
     emblaApi.on("select", updateControls);
     emblaApi.on("reInit", updateControls);
     return () => {
+      cancelAnimationFrame(frame);
       emblaApi.off("select", updateControls);
       emblaApi.off("reInit", updateControls);
     };
