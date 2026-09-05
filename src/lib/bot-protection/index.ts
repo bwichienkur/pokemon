@@ -23,7 +23,8 @@ export class HoneypotProvider implements BotProtectionProvider {
 
 /** Explicit development-only provider for local workflows without a bot service. */
 export class DevBypassProvider implements BotProtectionProvider {
-  async verify(_token: string | null | undefined): Promise<BotProtectionResult> {
+  async verify(token: string | null | undefined): Promise<BotProtectionResult> {
+    void token;
     return { success: true };
   }
 }

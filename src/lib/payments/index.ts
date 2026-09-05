@@ -22,7 +22,8 @@ export interface PaymentProvider {
 export const PAYMENTS_DISABLED_MESSAGE = "Payments are not currently enabled";
 
 export class DisabledPaymentProvider implements PaymentProvider {
-  async createCheckout(_request: CheckoutRequest): Promise<CheckoutResult> {
+  async createCheckout(request: CheckoutRequest): Promise<CheckoutResult> {
+    void request;
     return { ok: false, message: PAYMENTS_DISABLED_MESSAGE };
   }
 }
