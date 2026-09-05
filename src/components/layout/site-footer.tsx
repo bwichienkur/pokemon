@@ -1,6 +1,6 @@
 import Link from "next/link";
 
-import { Instagram, Mail, MessageCircle } from "lucide-react";
+import { Camera, Mail, MessageCircle } from "lucide-react";
 
 import { Logo } from "@/components/brand/logo";
 import { Container } from "@/components/layout/container";
@@ -27,7 +27,7 @@ export function SiteFooter() {
             <p className="mt-5 text-sm leading-6 text-muted-foreground">A discreet, considered marketplace for exceptional graded collectibles.</p>
             <div className="mt-6 flex gap-2">
               <a href="mailto:concierge@ateliergraded.com" className="inline-flex size-9 items-center justify-center rounded-full border border-border text-muted-foreground transition-colors hover:border-gold/50 hover:text-gold" aria-label="Email Atelier Graded"><Mail className="size-4" /></a>
-              <a href="#" className="inline-flex size-9 items-center justify-center rounded-full border border-border text-muted-foreground transition-colors hover:border-gold/50 hover:text-gold" aria-label="Instagram placeholder"><Instagram className="size-4" /></a>
+              <a href="#" className="inline-flex size-9 items-center justify-center rounded-full border border-border text-muted-foreground transition-colors hover:border-gold/50 hover:text-gold" aria-label="Instagram placeholder"><Camera className="size-4" /></a>
               <a href="#" className="inline-flex size-9 items-center justify-center rounded-full border border-border text-muted-foreground transition-colors hover:border-gold/50 hover:text-gold" aria-label="Community placeholder"><MessageCircle className="size-4" /></a>
             </div>
           </div>
