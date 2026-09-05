@@ -10,7 +10,7 @@ export interface CardTiltProps extends React.HTMLAttributes<HTMLDivElement> {
   maxTilt?: number;
 }
 
-export function CardTilt({ children, className, maxTilt = 14, ...props }: CardTiltProps) {
+export function CardTilt({ children, className, maxTilt = 18, ...props }: CardTiltProps) {
   const reducedMotion = useReducedMotion();
   const [enabled, setEnabled] = React.useState(false);
   const contentRef = React.useRef<HTMLDivElement>(null);

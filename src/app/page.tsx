@@ -23,47 +23,48 @@ export default async function Home() {
   return (
     <div className="overflow-hidden">
       <section className="relative min-h-[calc(100vh-4.5rem)] border-b border-border">
-        <div className="pointer-events-none absolute inset-0 bg-[radial-gradient(ellipse_at_70%_30%,rgba(198,167,94,0.2),transparent_34%),radial-gradient(circle_at_15%_80%,rgba(88,120,255,0.14),transparent_28%),linear-gradient(135deg,#05070c_0%,#0b1220_48%,#07080d_100%)]" />
-        <div className="pointer-events-none absolute inset-0 opacity-40 [background-image:linear-gradient(rgba(255,255,255,0.03)_1px,transparent_1px),linear-gradient(90deg,rgba(255,255,255,0.03)_1px,transparent_1px)] [background-size:72px_72px] [mask-image:radial-gradient(ellipse_at_center,black,transparent_75%)]" />
+        {/* Full-bleed WebGL stage — dominant visual plane */}
+        <div className="absolute inset-0">
+          <HeroSlab
+            card={hero}
+            fullBleed
+            hideCaption
+            className="h-full min-h-[calc(100vh-4.5rem)]"
+          />
+        </div>
 
-        <Container className="relative grid min-h-[calc(100vh-4.5rem)] items-center gap-10 py-16 lg:grid-cols-[0.95fr_1.05fr] lg:gap-8 xl:gap-12">
-          <div className="relative z-10 max-w-2xl">
-            <p className="mb-5 text-[0.7rem] font-bold uppercase tracking-[0.32em] text-gold">
-              Atelier Graded · Immersive showroom
+        {/* Readability veil — keeps copy legible without boxing the slab */}
+        <div className="pointer-events-none absolute inset-0 bg-gradient-to-r from-black/80 via-black/45 to-transparent lg:via-black/35" />
+        <div className="pointer-events-none absolute inset-x-0 bottom-0 h-40 bg-gradient-to-t from-black/70 to-transparent" />
+
+        <Container className="pointer-events-none relative flex min-h-[calc(100vh-4.5rem)] items-end pb-16 pt-28 sm:items-center sm:pb-20 sm:pt-24">
+          <div className="relative z-10 max-w-xl">
+            <p className="mb-4 font-display text-3xl tracking-tight text-gold sm:text-4xl">
+              Atelier Graded
             </p>
-            <h1 className="font-display text-6xl leading-[0.86] font-semibold tracking-tight sm:text-7xl lg:text-8xl">
-              Collect with
-              <br />
-              <span className="bg-gradient-to-r from-gold via-[#f0d78a] to-gold bg-clip-text text-transparent">
-                conviction.
-              </span>
+            <h1 className="font-display text-5xl leading-[0.92] font-semibold tracking-tight text-white sm:text-6xl lg:text-7xl">
+              Collect with conviction.
             </h1>
-            <p className="mt-7 max-w-lg text-base leading-8 text-muted-foreground sm:text-lg">
-              A cinematic private salon for graded collectibles — inspect every slab in light,
-              depth, and motion before you inquire.
+            <p className="mt-6 max-w-md text-base leading-7 text-white/70 sm:text-lg">
+              Move the light across a living slab — inspect depth, glare, and grade before you inquire.
             </p>
-            <div className="mt-9 flex flex-wrap gap-4">
+            <div className="mt-8 flex flex-wrap gap-4">
               <Link
                 href="/cards"
-                className="bg-primary px-6 py-3 text-sm font-semibold text-primary-foreground shadow-[0_0_40px_rgba(198,167,94,0.25)] transition hover:shadow-[0_0_55px_rgba(198,167,94,0.4)]"
+                className="pointer-events-auto bg-primary px-6 py-3 text-sm font-semibold text-primary-foreground shadow-[0_0_40px_rgba(198,167,94,0.3)] transition hover:shadow-[0_0_55px_rgba(198,167,94,0.45)]"
               >
                 Explore the collection
               </Link>
               <Link
                 href={hero ? `/cards/${hero.slug}` : "#featured"}
-                className="border border-white/15 bg-white/5 px-6 py-3 text-sm font-semibold backdrop-blur-sm hover:border-gold/50"
+                className="pointer-events-auto border border-white/20 bg-white/5 px-6 py-3 text-sm font-semibold text-white backdrop-blur-sm hover:border-gold/50"
               >
                 Inspect featured slab
               </Link>
             </div>
-            <p className="mt-6 text-xs tracking-[0.18em] text-white/45 uppercase">
-              Drag · tilt · scroll to feel the case
+            <p className="mt-6 text-[0.65rem] tracking-[0.22em] text-white/40 uppercase">
+              Pointer · scroll · feel the case
             </p>
-          </div>
-
-          <div className="relative">
-            <div className="pointer-events-none absolute -inset-8 rounded-[2rem] bg-[radial-gradient(circle,rgba(198,167,94,0.18),transparent_60%)] blur-2xl" />
-            <HeroSlab card={hero} className="relative z-10" />
           </div>
         </Container>
       </section>

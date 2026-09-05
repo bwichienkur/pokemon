@@ -1,5 +1,6 @@
 "use client";
 
+import * as React from "react";
 import dynamic from "next/dynamic";
 import Link from "next/link";
 
@@ -12,7 +13,7 @@ const HeroSlabCanvas = dynamic(
   () => import("@/components/3d/slab-scene").then((module) => module.SlabScene),
   {
     ssr: false,
-    loading: () => <Skeleton className="h-full min-h-[28rem] w-full rounded-[1.75rem]" />,
+    loading: () => <Skeleton className="h-full min-h-[28rem] w-full" />,
   },
 );
 
@@ -21,6 +22,10 @@ export interface HeroSlabProps {
   frontUrl?: string;
   backUrl?: string;
   className?: string;
+  /** Edge-to-edge stage with no card chrome — for immersive landing heroes. */
+  fullBleed?: boolean;
+  /** Hide the featured caption overlay (copy lives elsewhere on the page). */
+  hideCaption?: boolean;
 }
 
 export function HeroSlab({
@@ -28,6 +33,8 @@ export function HeroSlab({
   frontUrl: suppliedFrontUrl,
   backUrl: suppliedBackUrl,
   className,
+  fullBleed = false,
+  hideCaption = false,
 }: HeroSlabProps) {
   const frontUrl =
     suppliedFrontUrl ??
@@ -37,20 +44,35 @@ export function HeroSlab({
     suppliedBackUrl ??
     card?.images.find((image) => image.imageType === "BACK")?.imageUrl ??
     frontUrl;
+  const [wideStage, setWideStage] = React.useState(false);
+
+  React.useEffect(() => {
+    const media = window.matchMedia("(min-width: 1024px)");
+    const sync = () => setWideStage(media.matches);
+    sync();
+    media.addEventListener("change", sync);
+    return () => media.removeEventListener("change", sync);
+  }, []);
 
   return (
     <div
       className={cn(
-        "relative isolate h-[min(78vw,46rem)] min-h-[28rem] w-full overflow-hidden rounded-[1.75rem]",
-        "border border-white/10 bg-[#05070c]",
-        "shadow-[0_40px_120px_rgba(0,0,0,0.55),inset_0_1px_0_rgba(255,255,255,0.08)]",
+        "relative isolate h-full min-h-[28rem] w-full overflow-hidden bg-[#05070c]",
+        !fullBleed &&
+          "h-[min(78vw,46rem)] rounded-[1.75rem] border border-white/10 shadow-[0_40px_120px_rgba(0,0,0,0.55),inset_0_1px_0_rgba(255,255,255,0.08)]",
         className,
       )}
     >
       {/* Atmospheric stage lighting */}
-      <div className="pointer-events-none absolute inset-0 bg-[radial-gradient(ellipse_at_50%_20%,rgba(198,167,94,0.22),transparent_42%),radial-gradient(circle_at_80%_70%,rgba(90,140,255,0.16),transparent_35%),radial-gradient(circle_at_15%_75%,rgba(180,90,255,0.1),transparent_30%)]" />
-      <div className="pointer-events-none absolute inset-x-0 top-0 z-10 h-1/3 bg-gradient-to-b from-white/10 to-transparent" />
-      <div className="pointer-events-none absolute inset-x-8 bottom-6 z-10 h-24 rounded-full bg-black/50 blur-2xl" />
+      <div className="pointer-events-none absolute inset-0 bg-[radial-gradient(ellipse_at_50%_18%,rgba(198,167,94,0.28),transparent_40%),radial-gradient(circle_at_82%_68%,rgba(90,140,255,0.2),transparent_34%),radial-gradient(circle_at_12%_78%,rgba(180,90,255,0.14),transparent_28%)]" />
+      <div className="pointer-events-none absolute inset-x-0 top-0 z-10 h-1/3 bg-gradient-to-b from-white/[0.12] to-transparent" />
+      <div className="pointer-events-none absolute inset-x-[12%] bottom-[8%] z-10 h-28 rounded-full bg-black/55 blur-3xl" />
+
+      {/* Soft floating dust for depth beyond the WebGL canvas */}
+      <div
+        aria-hidden
+        className="pointer-events-none absolute inset-0 z-[5] opacity-50 [background-image:radial-gradient(1.5px_1.5px_at_20%_30%,rgba(240,213,138,0.55),transparent),radial-gradient(1px_1px_at_70%_20%,rgba(255,255,255,0.45),transparent),radial-gradient(1.5px_1.5px_at_40%_70%,rgba(140,190,255,0.4),transparent),radial-gradient(1px_1px_at_85%_55%,rgba(240,213,138,0.35),transparent),radial-gradient(1px_1px_at_15%_80%,rgba(255,255,255,0.3),transparent)] animate-[pulse_7s_ease-in-out_infinite]"
+      />
 
       {frontUrl && backUrl ? (
         <HeroSlabCanvas
@@ -58,13 +80,14 @@ export function HeroSlab({
           backUrl={backUrl}
           enableScrollTilt
           cinematic
-          className="min-h-[28rem]"
+          stageOffset={fullBleed && wideStage ? [1.35, 0.05, 0] : [0, 0, 0]}
+          className={cn("min-h-[28rem]", fullBleed && "min-h-full")}
         />
       ) : (
         <Skeleton className="h-full min-h-[28rem] w-full rounded-none" />
       )}
 
-      {card && (
+      {!hideCaption && card && (
         <div className="pointer-events-none absolute inset-x-0 bottom-0 z-20 bg-gradient-to-t from-black/80 via-black/35 to-transparent p-5 pt-16 sm:p-6">
           <div className="flex items-end justify-between gap-4">
             <div className="min-w-0">

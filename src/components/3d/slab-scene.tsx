@@ -27,6 +27,8 @@ export interface SlabSceneProps {
   scale?: number;
   enablePointerTilt?: boolean;
   cinematic?: boolean;
+  /** Shift the slab in world space — useful for full-bleed heroes with left copy. */
+  stageOffset?: [number, number, number];
 }
 
 interface SlabModelProps extends Omit<SlabSceneProps, "className" | "cinematic"> {
@@ -34,6 +36,7 @@ interface SlabModelProps extends Omit<SlabSceneProps, "className" | "cinematic">
   cinematic: boolean;
   scrollTilt: React.MutableRefObject<number>;
   pointerTarget: React.MutableRefObject<{ x: number; y: number }>;
+  stageOffset: [number, number, number];
 }
 
 function HoloSheen({ simplify }: { simplify: boolean }) {
@@ -77,7 +80,7 @@ function HoloSheen({ simplify }: { simplify: boolean }) {
             color = mix(color, gold, sweep * 0.65);
             float edge = smoothstep(0.0, 0.18, vUv.x) * smoothstep(1.0, 0.82, vUv.x)
               * smoothstep(0.0, 0.12, vUv.y) * smoothstep(1.0, 0.88, vUv.y);
-            float alpha = (0.08 + wave * 0.12 + sweep * 0.1) * edge;
+            float alpha = (0.12 + wave * 0.18 + sweep * 0.16) * edge;
             gl_FragColor = vec4(color, alpha);
           }
         `}
@@ -97,16 +100,20 @@ function SlabModel({
   rotation = [0, 0],
   scale = 1,
   enablePointerTilt = true,
+  stageOffset,
 }: SlabModelProps) {
   const group = React.useRef<THREE.Group>(null);
   const glowRef = React.useRef<THREE.Mesh>(null);
   const [frontTexture, backTexture] = useTexture([frontUrl, backUrl]);
   const { invalidate, viewport } = useThree();
+  const baseX = stageOffset[0];
+  const baseY = stageOffset[1];
+  const baseZ = stageOffset[2];
 
   React.useEffect(() => {
     for (const texture of [frontTexture, backTexture]) {
       texture.colorSpace = THREE.SRGBColorSpace;
-      texture.anisotropy = simplify ? 2 : 8;
+      texture.anisotropy = simplify ? 2 : 16;
       texture.needsUpdate = true;
     }
   }, [backTexture, frontTexture, simplify]);
@@ -115,16 +122,22 @@ function SlabModel({
     if (!group.current) return;
     const time = state.clock.getElapsedTime();
     const intensity = cinematic && !simplify ? 1 : 0.55;
-    const idleY = Math.sin(time * 0.85) * (0.12 * intensity);
-    const idleRoll = Math.sin(time * 0.45) * (0.035 * intensity);
-    const pointerY = enablePointerTilt ? pointerTarget.current.x * (0.42 * intensity) : 0;
-    const pointerX = enablePointerTilt ? -pointerTarget.current.y * (0.28 * intensity) : 0;
-    const scrollBoost = scrollTilt.current * (cinematic ? 0.18 : 0.05);
+    const idleY = Math.sin(time * 0.85) * (0.18 * intensity);
+    const idleRoll = Math.sin(time * 0.45) * (0.045 * intensity);
+    const pointerY = enablePointerTilt ? pointerTarget.current.x * (0.55 * intensity) : 0;
+    const pointerX = enablePointerTilt ? -pointerTarget.current.y * (0.36 * intensity) : 0;
+    const scrollBoost = scrollTilt.current * (cinematic ? 0.28 : 0.05);
     const targetX = rotation[0] + pointerX + scrollBoost + idleRoll * 0.25;
     const targetY = rotation[1] + pointerY + (showBack ? Math.PI : 0) + idleRoll;
-    const targetZ = idleRoll * 0.4;
+    const targetZ = idleRoll * 0.55;
 
-    group.current.position.y = THREE.MathUtils.lerp(group.current.position.y, idleY, 0.08);
+    group.current.position.x = THREE.MathUtils.lerp(group.current.position.x, baseX, 0.08);
+    group.current.position.y = THREE.MathUtils.lerp(
+      group.current.position.y,
+      baseY + idleY,
+      0.08,
+    );
+    group.current.position.z = THREE.MathUtils.lerp(group.current.position.z, baseZ, 0.08);
     group.current.rotation.x = THREE.MathUtils.lerp(group.current.rotation.x, targetX, 0.1);
     group.current.rotation.y = THREE.MathUtils.lerp(group.current.rotation.y, targetY, 0.1);
     group.current.rotation.z = THREE.MathUtils.lerp(group.current.rotation.z, targetZ, 0.08);
@@ -134,7 +147,7 @@ function SlabModel({
       const pulse = 0.85 + Math.sin(time * 1.6) * 0.15;
       glowRef.current.scale.setScalar(pulse);
       const material = glowRef.current.material as THREE.MeshBasicMaterial;
-      material.opacity = 0.18 + Math.sin(time * 1.2) * 0.05;
+      material.opacity = 0.22 + Math.sin(time * 1.2) * 0.06;
     }
 
     // Keep demand-mode canvases alive while the slab is moving.
@@ -149,24 +162,30 @@ function SlabModel({
 
     // Soft camera parallax for cinematic hero scenes.
     if (cinematic && !simplify) {
+      const lookX = baseX * 0.35;
       state.camera.position.x = THREE.MathUtils.lerp(
         state.camera.position.x,
-        pointerTarget.current.x * 0.45,
-        0.05,
+        lookX + pointerTarget.current.x * 0.65,
+        0.06,
       );
       state.camera.position.y = THREE.MathUtils.lerp(
         state.camera.position.y,
-        -pointerTarget.current.y * 0.28 + scrollTilt.current * 0.2,
-        0.05,
+        -pointerTarget.current.y * 0.38 + scrollTilt.current * 0.32,
+        0.06,
       );
-      state.camera.lookAt(0, 0, 0);
+      state.camera.position.z = THREE.MathUtils.lerp(
+        state.camera.position.z,
+        5.2 - Math.abs(pointerTarget.current.x) * 0.25,
+        0.04,
+      );
+      state.camera.lookAt(baseX * 0.55, baseY * 0.2, 0);
     }
 
     void viewport;
   });
 
   const caseBody = (
-    <group ref={group}>
+    <group ref={group} position={stageOffset}>
       <mesh castShadow receiveShadow>
         <boxGeometry args={[2.55, 3.55, 0.22]} />
         <meshPhysicalMaterial attach="material-0" color="#d5dde4" roughness={0.18} metalness={0.12} clearcoat={0.55} />
@@ -238,7 +257,7 @@ function SlabModel({
   return (
     <>
       {cinematic && !simplify ? (
-        <Float speed={1.2} rotationIntensity={0.18} floatIntensity={0.35}>
+        <Float speed={1.35} rotationIntensity={0.22} floatIntensity={0.42}>
           {caseBody}
         </Float>
       ) : (
@@ -246,39 +265,51 @@ function SlabModel({
       )}
 
       <ContactShadows
-        position={[0, -2.15, 0]}
-        opacity={cinematic ? 0.42 : 0.28}
-        scale={8}
-        blur={2.8}
-        far={4}
+        position={[baseX, -2.15 + baseY, baseZ]}
+        opacity={cinematic ? 0.5 : 0.28}
+        scale={10}
+        blur={2.6}
+        far={4.5}
       />
 
       {!simplify && (
         <>
-          <Environment preset={cinematic ? "studio" : "city"} environmentIntensity={cinematic ? 0.85 : 0.7} />
+          <Environment preset={cinematic ? "studio" : "city"} environmentIntensity={cinematic ? 1.05 : 0.7} />
           {cinematic && (
-            <Sparkles
-              count={42}
-              scale={[7, 6, 3]}
-              size={2.2}
-              speed={0.35}
-              opacity={0.45}
-              color="#f0d58a"
-            />
+            <>
+              <Sparkles
+                count={72}
+                scale={[10, 7, 4]}
+                size={2.6}
+                speed={0.42}
+                opacity={0.55}
+                color="#f0d58a"
+                position={[baseX * 0.4, 0.4, 0]}
+              />
+              <Sparkles
+                count={36}
+                scale={[8, 5, 3]}
+                size={1.4}
+                speed={0.25}
+                opacity={0.35}
+                color="#9ec8ff"
+                position={[baseX * 0.4, -0.2, -0.5]}
+              />
+            </>
           )}
-          <mesh rotation={[-Math.PI / 2, 0, 0]} position={[0, -2.2, 0]}>
-            <planeGeometry args={[12, 12]} />
+          <mesh rotation={[-Math.PI / 2, 0, 0]} position={[baseX * 0.35, -2.2 + baseY, baseZ]}>
+            <planeGeometry args={[16, 14]} />
             <MeshReflectorMaterial
-              blur={[180, 60]}
-              resolution={cinematic ? 512 : 256}
-              mixBlur={0.55}
-              mixStrength={cinematic ? 0.55 : 0.25}
-              roughness={0.82}
-              depthScale={0.6}
+              blur={[220, 80]}
+              resolution={cinematic ? 768 : 256}
+              mixBlur={0.5}
+              mixStrength={cinematic ? 0.72 : 0.25}
+              roughness={0.78}
+              depthScale={0.7}
               minDepthThreshold={0.3}
               maxDepthThreshold={1.2}
-              color="#07090e"
-              metalness={0.4}
+              color="#06080d"
+              metalness={0.5}
             />
           </mesh>
         </>
@@ -294,6 +325,7 @@ export function SlabScene({
   enableScrollTilt = false,
   className,
   cinematic = false,
+  stageOffset = [0, 0, 0],
   ...modelProps
 }: SlabSceneProps) {
   const hostRef = React.useRef<HTMLDivElement>(null);
@@ -317,7 +349,7 @@ export function SlabScene({
   React.useEffect(() => {
     if (!enableScrollTilt) return;
     const updateTilt = () => {
-      scrollTilt.current = THREE.MathUtils.clamp(window.scrollY / 700, -1.2, 1.2);
+      scrollTilt.current = THREE.MathUtils.clamp(window.scrollY / 520, -1.4, 1.4);
     };
     updateTilt();
     window.addEventListener("scroll", updateTilt, { passive: true });
@@ -338,6 +370,8 @@ export function SlabScene({
     pointerTarget.current = { x: 0, y: 0 };
   };
 
+  const resolvedOffset: [number, number, number] = stageOffset;
+
   return (
     <div
       ref={hostRef}
@@ -349,28 +383,46 @@ export function SlabScene({
         <Canvas
           dpr={simplify ? [1, 1.25] : cinematic ? [1, 2] : [1, 1.75]}
           frameloop={cinematic && !simplify ? "always" : "demand"}
-          camera={{ position: [0, 0.15, cinematic ? 5.7 : 6.3], fov: cinematic ? 32 : 34 }}
+          camera={{ position: [0, 0.15, cinematic ? 5.4 : 6.3], fov: cinematic ? 30 : 34 }}
           gl={{
             antialias: !simplify,
             alpha: true,
             powerPreference: simplify ? "low-power" : "high-performance",
             toneMapping: THREE.ACESFilmicToneMapping,
-            toneMappingExposure: cinematic ? 1.15 : 1,
+            toneMappingExposure: cinematic ? 1.22 : 1,
           }}
         >
           <color attach="background" args={[cinematic ? "#05070c" : "#0b0d12"]} />
-          <fog attach="fog" args={[cinematic ? "#05070c" : "#0b0d12", 8, cinematic ? 16 : 18]} />
-          <ambientLight intensity={cinematic ? 0.45 : 0.65} />
-          <directionalLight position={[4.2, 5.2, 3.5]} intensity={cinematic ? 2.6 : 2} color="#fff1d2" castShadow={!simplify} />
-          <directionalLight position={[-5, 1.5, 2.5]} intensity={cinematic ? 1.1 : 0.7} color="#8ec5ff" />
+          <fog attach="fog" args={[cinematic ? "#05070c" : "#0b0d12", 7, cinematic ? 15 : 18]} />
+          <ambientLight intensity={cinematic ? 0.38 : 0.65} />
+          <directionalLight
+            position={[4.2 + resolvedOffset[0] * 0.2, 5.2, 3.5]}
+            intensity={cinematic ? 3.1 : 2}
+            color="#fff1d2"
+            castShadow={!simplify}
+          />
+          <directionalLight
+            position={[-5 + resolvedOffset[0] * 0.15, 1.5, 2.5]}
+            intensity={cinematic ? 1.35 : 0.7}
+            color="#8ec5ff"
+          />
           <spotLight
-            position={[0, 4.5, 5]}
-            angle={0.42}
-            penumbra={0.55}
-            intensity={cinematic ? 2.4 : 1.2}
+            position={[resolvedOffset[0], 4.8, 5.2]}
+            angle={0.38}
+            penumbra={0.6}
+            intensity={cinematic ? 3.2 : 1.2}
             color="#ffe6a8"
           />
-          <pointLight position={[0, -1.2, 3]} intensity={cinematic ? 0.9 : 0.35} color="#7aa7ff" />
+          <pointLight
+            position={[resolvedOffset[0], -1.2, 3]}
+            intensity={cinematic ? 1.15 : 0.35}
+            color="#7aa7ff"
+          />
+          <pointLight
+            position={[resolvedOffset[0] + 2.2, 2.4, 1.5]}
+            intensity={cinematic ? 0.75 : 0}
+            color="#ffc978"
+          />
           <React.Suspense fallback={null}>
             <SlabModel
               frontUrl={frontUrl}
@@ -380,6 +432,7 @@ export function SlabScene({
               cinematic={cinematic}
               scrollTilt={scrollTilt}
               pointerTarget={pointerTarget}
+              stageOffset={resolvedOffset}
               {...modelProps}
             />
           </React.Suspense>
