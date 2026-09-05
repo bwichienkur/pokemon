@@ -17,10 +17,12 @@ async function Results({ searchParams }: { searchParams: Promise<Search> }) {
   const raw = await searchParams;
   const parsed = cardFiltersSchema.safeParse(raw);
   const filters = parsed.success ? parsed.data : cardFiltersSchema.parse({});
-  const [result, user] = await Promise.all([getCards(filters), getCurrentUser()]);
+  const [result, user] = await Promise.all([
+    getCards({ ...filters, publicationStatus: ["PUBLISHED"] }),
+    getCurrentUser(),
+  ]);
   const favorites = user ? await getFavorites(user.id) : [];
-  const items = result.items.filter((card) => card.publicationStatus === "PUBLISHED");
-  const { total, page, perPage } = { ...result, total: result.items.filter((card) => card.publicationStatus === "PUBLISHED").length };
+  const { items, total, page, perPage } = result;
   const pages = Math.ceil(total / perPage);
   const makePage = (next: number) => { const params = new URLSearchParams(); Object.entries(raw).forEach(([key, value]) => params.set(key, Array.isArray(value) ? value.join(",") : value ?? "")); params.set("page", String(next)); return `/cards?${params}`; };
   return <><p className="mb-6 text-sm text-muted-foreground">{total} {total === 1 ? "piece" : "pieces"} in the catalogue</p><CatalogGrid cards={items} userId={user?.id} favoriteCardIds={favorites.map((card) => card.id)} />{pages > 1 && <nav className="mt-10 flex justify-center gap-4" aria-label="Catalog pagination">{page > 1 && <Link className="border border-border px-4 py-2 text-sm hover:border-gold" href={makePage(page - 1)}>Previous</Link>}<span className="px-4 py-2 text-sm text-muted-foreground">Page {page} of {pages}</span>{page < pages && <Link className="border border-border px-4 py-2 text-sm hover:border-gold" href={makePage(page + 1)}>Next</Link>}</nav>}</>;

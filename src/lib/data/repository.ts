@@ -124,9 +124,35 @@ export async function getCardById(id: string): Promise<CardWithImages | null> {
   const { data, error } = await createAdminClient().from("cards").select("*, card_images(*)").eq("id", id).maybeSingle();
   if (error) throw error; return data ? mapCardRow(asRecord(data)) : null;
 }
-export async function getFeaturedCards(limit = 6) { return (await getCards({ featured: true, availability: ["AVAILABLE"], perPage: limit })).items; }
-export async function getNewArrivals(limit = 12) { return (await getCards({ availability: ["AVAILABLE"], sort: "recently_added", perPage: limit })).items; }
-export async function getSoldCards(limit = 12) { return (await getCards({ availability: ["SOLD"], perPage: limit })).items; }
+export async function getFeaturedCards(limit = 6) {
+  return (
+    await getCards({
+      featured: true,
+      availability: ["AVAILABLE"],
+      publicationStatus: ["PUBLISHED"],
+      perPage: limit,
+    })
+  ).items;
+}
+export async function getNewArrivals(limit = 12) {
+  return (
+    await getCards({
+      availability: ["AVAILABLE"],
+      publicationStatus: ["PUBLISHED"],
+      sort: "recently_added",
+      perPage: limit,
+    })
+  ).items;
+}
+export async function getSoldCards(limit = 12) {
+  return (
+    await getCards({
+      availability: ["SOLD"],
+      publicationStatus: ["PUBLISHED"],
+      perPage: limit,
+    })
+  ).items;
+}
 
 export async function createCard(input: CardCreateInput, actorId: string): Promise<Card> {
   await assertAdmin(actorId); const now = isoNow();
