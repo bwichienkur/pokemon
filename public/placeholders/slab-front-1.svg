@@ -1,0 +1,12 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="800" height="1120" viewBox="0 0 800 1120" role="img" aria-labelledby="title desc">
+  <title id="title">Demo graded card slab placeholder, front</title>
+  <desc id="desc">A neutral placeholder for a fictional graded card listing.</desc>
+  <rect width="800" height="1120" fill="#0f172a"/>
+  <rect x="55" y="40" width="690" height="1040" rx="34" fill="#e2e8f0" stroke="#94a3b8" stroke-width="12"/>
+  <rect x="95" y="90" width="610" height="150" rx="14" fill="#d4af37"/>
+  <text x="400" y="165" text-anchor="middle" font-family="system-ui, sans-serif" font-size="42" font-weight="700" fill="#172033">ATELIER GRADED</text>
+  <rect x="110" y="275" width="580" height="620" rx="18" fill="#334155"/>
+  <circle cx="400" cy="570" r="175" fill="#64748b"/>
+  <text x="400" y="585" text-anchor="middle" font-family="system-ui, sans-serif" font-size="38" fill="#f8fafc">DEMO</text>
+  <text x="400" y="960" text-anchor="middle" font-family="system-ui, sans-serif" font-size="28" fill="#334155">FICTIONAL INVENTORY</text>
+</svg>
