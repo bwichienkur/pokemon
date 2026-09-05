@@ -94,9 +94,9 @@ function escapeHtml(value: string): string {
 function inquiryDetails(inquiry: Inquiry, card: Card): string {
   return [
     `Card: ${card.title} (${card.grader} ${card.grade})`,
-    `Buyer: ${inquiry.buyerName} <${inquiry.buyerEmail}>`,
+    `Buyer: ${inquiry.name} <${inquiry.email}>`,
     `Preferred contact: ${inquiry.preferredContactMethod}`,
-    inquiry.buyerPhone ? `Phone: ${inquiry.buyerPhone}` : undefined,
+    inquiry.phone ? `Phone: ${inquiry.phone}` : undefined,
     "",
     inquiry.message,
   ]
@@ -119,14 +119,14 @@ export async function sendInquiryAdminNotification(
 
   return provider.send({
     to: env.ADMIN_EMAIL,
-    replyTo: inquiry.buyerEmail,
+    replyTo: inquiry.email,
     subject: `New inquiry: ${card.title}`,
     text: `${details}\n\nReview inquiry: ${inquiryUrl}`,
     html: `<h1>New inquiry</h1><p><strong>${escapeHtml(card.title)}</strong> (${escapeHtml(
       card.grader,
     )} ${escapeHtml(card.grade)})</p><p><strong>Buyer:</strong> ${escapeHtml(
-      inquiry.buyerName,
-    )} &lt;${escapeHtml(inquiry.buyerEmail)}&gt;</p><p><strong>Preferred contact:</strong> ${escapeHtml(
+      inquiry.name,
+    )} &lt;${escapeHtml(inquiry.email)}&gt;</p><p><strong>Preferred contact:</strong> ${escapeHtml(
       inquiry.preferredContactMethod,
     )}</p><p><strong>Message:</strong><br>${escapeHtml(inquiry.message).replace(/\n/g, "<br>")}</p><p><a href="${inquiryUrl}">Review inquiry</a></p>`,
   });
@@ -141,7 +141,7 @@ export async function sendInquiryBuyerConfirmation(
   const subject = `We received your inquiry about ${card.title}`;
 
   return provider.send({
-    to: inquiry.buyerEmail,
+    to: inquiry.email,
     subject,
     text: `Thank you for contacting ${BRAND_NAME}.\n\nWe received your inquiry about ${card.title} (${card.grader} ${card.grade}). A member of our team will be in touch soon.\n\nView the card: ${cardUrl}\n\n${SITE_TAGLINE}`,
     html: `<h1>Thank you for your inquiry</h1><p>We received your inquiry about <strong>${escapeHtml(
