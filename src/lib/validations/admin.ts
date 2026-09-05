@@ -27,9 +27,12 @@ export const inquiryNoteSchema = z
 export const appSettingsSchema = z
   .object({
     showroomVisible: z.boolean().default(true),
-    directCheckoutEnabled: z.boolean().default(false),
+    // Checkout is intentionally disabled until a payment flow is implemented.
+    directCheckoutEnabled: z.literal(false).default(false),
     inquiryAutoReplyEnabled: z.boolean().default(true),
     inquiryNotificationEmail: z.string().trim().email().max(254).nullable().optional(),
+    inquiryCcEmails: z.array(z.string().trim().email().max(254)).max(10).default([]),
+    siteNotice: z.string().trim().max(500).nullable().optional(),
     featuredCardLimit: z.number().int().min(0).max(24).default(6),
   })
   .strict();

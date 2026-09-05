@@ -65,6 +65,9 @@ export async function updateSettingsAction(input: unknown) {
 export async function setUserRoleAction(targetId: string, role: Role) {
   const admin = await requireAdmin();
   if (role !== "ADMIN" && role !== "USER") throw new ValidationError("Invalid role.");
+  if (targetId === admin.id) {
+    throw new ValidationError("You cannot change your own administrator role.");
+  }
   const user = await setUserRole(targetId, role, admin.id);
   revalidatePath("/admin/users");
   return user;

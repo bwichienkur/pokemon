@@ -1,69 +1,31 @@
-import Image from "next/image";
+import dynamic from "next/dynamic";
+import Link from "next/link";
 
-export default function Home() {
-  return (
-    <div className="flex flex-col flex-1 items-center justify-center bg-zinc-50 font-sans dark:bg-black">
-      <main className="flex flex-1 w-full max-w-3xl flex-col items-center justify-between py-32 px-16 bg-white dark:bg-black sm:items-start">
-        <Image
-          className="dark:invert h-5 w-[100px]"
-          src="/next.svg"
-          alt="Next.js logo"
-          width={100}
-          height={20}
-          priority
-        />
-        <div className="flex flex-col items-center gap-6 text-center sm:items-start sm:text-left">
-          <h1 className="max-w-xs text-3xl font-semibold leading-10 tracking-tight text-black dark:text-zinc-50">
-            To get started, edit the{" "}
-            <code className="rounded bg-black/[.06] px-1.5 py-0.5 font-mono text-[0.9em] dark:bg-white/[.08]">
-              page.tsx
-            </code>{" "}
-            file.
-          </h1>
-          <p className="max-w-md text-lg leading-8 text-zinc-600 dark:text-zinc-400">
-            Looking for a starting point or more instructions? Head over to{" "}
-            <a
-              href="https://vercel.com/templates?framework=next.js&utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-              className="font-medium text-zinc-950 dark:text-zinc-50"
-            >
-              Templates
-            </a>{" "}
-            or the{" "}
-            <a
-              href="https://nextjs.org/learn?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-              className="font-medium text-zinc-950 dark:text-zinc-50"
-            >
-              Learning
-            </a>{" "}
-            center.
-          </p>
-        </div>
-        <div className="flex flex-col gap-4 text-base font-medium sm:flex-row">
-          <a
-            className="flex h-12 w-full items-center justify-center gap-2 rounded-full bg-foreground px-5 text-background transition-colors hover:bg-[#383838] dark:hover:bg-[#ccc] md:w-[158px]"
-            href="https://vercel.com/new?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            <Image
-              className="dark:invert h-[14px] w-4"
-              src="/vercel.svg"
-              alt="Vercel logomark"
-              width={16}
-              height={14}
-            />
-            Deploy Now
-          </a>
-          <a
-            className="flex h-12 w-full items-center justify-center rounded-full border border-solid border-black/[.08] px-5 transition-colors hover:border-transparent hover:bg-black/[.04] dark:border-white/[.145] dark:hover:bg-[#1a1a1a] md:w-[158px]"
-            href="https://nextjs.org/docs?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            Documentation
-          </a>
-        </div>
-      </main>
-    </div>
-  );
+import { CatalogGrid } from "@/components/cards/catalog-grid";
+import { Container } from "@/components/layout/container";
+import { MotionSection } from "@/components/layout/motion-section";
+import { NewsletterForm } from "@/components/layout/newsletter-form";
+import { SectionHeading } from "@/components/layout/section-heading";
+import { getFeaturedCards, getNewArrivals, getSoldCards } from "@/lib/data/repository";
+
+const HeroSlab = dynamic(() => import("@/components/3d/hero-slab").then((module) => module.HeroSlab));
+
+export default async function Home() {
+  const [featured, arrivals, sold] = await Promise.all([getFeaturedCards(3), getNewArrivals(3), getSoldCards(3)]);
+  const hero = featured[0];
+  return <div className="overflow-hidden">
+    <section className="relative min-h-[calc(100vh-4.5rem)] border-b border-border bg-[radial-gradient(circle_at_75%_35%,rgba(198,167,94,.16),transparent_30%),linear-gradient(120deg,#080a0f,#0d1420_55%,#07080b)]">
+      <Container className="grid min-h-[calc(100vh-4.5rem)] items-center gap-12 py-20 lg:grid-cols-[1.1fr_.9fr]">
+        <div className="relative z-10"><p className="mb-6 text-xs font-bold uppercase tracking-[.3em] text-gold">Atelier Graded · Private showroom</p><h1 className="max-w-3xl font-display text-6xl leading-[.84] font-semibold tracking-tight sm:text-7xl lg:text-8xl">Collect with<br /><span className="text-gold">conviction.</span></h1><p className="mt-8 max-w-lg text-base leading-8 text-muted-foreground sm:text-lg">An exacting edit of graded collectibles, considered for condition, provenance, and the private collections they will enter.</p><div className="mt-10 flex flex-wrap gap-4"><Link href="/cards" className="bg-primary px-6 py-3 text-sm font-semibold text-primary-foreground">Explore the collection</Link><Link href={hero ? `/cards/${hero.slug}` : "#featured"} className="border border-border px-6 py-3 text-sm font-semibold hover:border-gold/60">View featured</Link></div></div>
+        <HeroSlab card={hero} />
+      </Container>
+    </section>
+    <MotionSection id="featured" className="py-24 sm:py-32"><Container><div className="flex flex-col justify-between gap-6 md:flex-row md:items-end"><SectionHeading eyebrow="The selection" title="Featured acquisitions" description="Exceptional examples chosen for collectors who value the details." /><Link href="/featured" className="text-sm font-semibold text-gold hover:text-gold-bright">View all featured →</Link></div><div className="mt-12"><CatalogGrid cards={featured} /></div></Container></MotionSection>
+    <MotionSection className="border-y border-border bg-card/30 py-24 sm:py-32"><Container><div className="flex flex-col justify-between gap-6 md:flex-row md:items-end"><SectionHeading eyebrow="New to the salon" title="New arrivals" description="Freshly catalogued, photographed, and ready for private inquiry." /><Link href="/new-arrivals" className="text-sm font-semibold text-gold">See new arrivals →</Link></div><div className="mt-12"><CatalogGrid cards={arrivals} /></div></Container></MotionSection>
+    <MotionSection className="py-24 sm:py-32"><Container><SectionHeading eyebrow="A considered standard" title="The confidence to inquire" align="center" description="We present grader attribution and item-level details clearly so your own research can begin from a better place." /><div className="mt-14 grid gap-px border border-border bg-border md:grid-cols-4">{["PSA", "BGS", "CGC", "TAG"].map((grader) => <div key={grader} className="bg-background p-7 text-center"><p className="font-display text-3xl text-gold">{grader}</p><p className="mt-2 text-xs leading-5 text-muted-foreground">Grader named in every listing</p></div>)}</div></Container></MotionSection>
+    <MotionSection className="border-y border-border bg-navy py-24 sm:py-32"><Container><div className="grid gap-12 lg:grid-cols-2"><SectionHeading eyebrow="Private inquiry" title="A more personal way to acquire" description="Our showroom does not use a checkout counter. Each acquisition begins with a conversation." /><ol className="grid gap-6">{[["01","Discover an item"],["02","Send a confidential inquiry"],["03","Confirm terms and shipping"],["04","Acquire with care"]].map(([number, label]) => <li className="flex items-center gap-5 border-b border-border pb-5" key={number}><span className="font-display text-3xl text-gold">{number}</span><span className="text-sm font-semibold">{label}</span></li>)}</ol></div></Container></MotionSection>
+    <MotionSection className="py-24 sm:py-32"><Container><SectionHeading eyebrow="Collector's advantage" title="The details stay in focus" /><div className="mt-12 grid gap-8 md:grid-cols-3">{[["Clear attribution","Grader, certificate, condition notes, and images in one considered record."],["Private attention","A human response to every serious inquiry, without a rushed cart experience."],["Careful presentation","Photography and cataloguing built for collectors who scrutinize the particulars."]].map(([title, description]) => <div className="border-t border-gold/50 pt-5" key={title}><h3 className="font-display text-3xl">{title}</h3><p className="mt-3 text-sm leading-7 text-muted-foreground">{description}</p></div>)}</div></Container></MotionSection>
+    <MotionSection className="border-y border-border bg-card/30 py-24 sm:py-32"><Container><div className="flex items-end justify-between gap-6"><SectionHeading eyebrow="Placed with collectors" title="Recently sold" /><Link href="/sold" className="text-sm font-semibold text-gold">View sold archive →</Link></div><div className="mt-12"><CatalogGrid cards={sold} /></div></Container></MotionSection>
+    <MotionSection className="py-24 sm:py-32"><Container><div className="border border-gold/25 bg-[linear-gradient(120deg,rgba(198,167,94,.12),transparent_50%)] px-7 py-14 sm:px-14"><p className="text-xs font-bold uppercase tracking-[.24em] text-gold">The private list</p><h2 className="mt-4 max-w-xl font-display text-5xl leading-[.9]">First notice, thoughtfully delivered.</h2><p className="mt-5 max-w-xl text-sm leading-7 text-muted-foreground">Join for new acquisitions and showroom notes. No frequency promise; only worthwhile correspondence.</p><NewsletterForm /></div></Container></MotionSection>
+  </div>;
 }

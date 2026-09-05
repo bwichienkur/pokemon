@@ -172,6 +172,7 @@ export const cardFiltersSchema = z
       z.array(z.number().min(1).max(10)).max(20).optional(),
     ),
     availability: queryList(availabilityStatuses),
+    publicationStatus: queryList(publicationStatuses),
     languages: z.preprocess(
       (value) =>
         typeof value === "string"

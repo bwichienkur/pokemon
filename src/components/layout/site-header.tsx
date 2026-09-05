@@ -10,7 +10,7 @@ import { Sheet, SheetContent, SheetDescription, SheetHeader, SheetTitle, SheetTr
 import { cn } from "@/lib/utils";
 
 const navigation = [
-  { href: "/collection", label: "Collection" },
+  { href: "/cards", label: "Collection" },
   { href: "/new-arrivals", label: "New Arrivals" },
   { href: "/featured", label: "Featured" },
   { href: "/sold", label: "Sold" },

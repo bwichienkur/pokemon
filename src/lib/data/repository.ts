@@ -5,6 +5,7 @@ import { env } from "@/lib/env";
 import { assertInventoryTransition } from "@/lib/inventory";
 import { readStore, updateStore } from "@/lib/data/local-store";
 import {
+  cardImageToSnake,
   cardToSnake,
   inquiryNoteToSnake,
   inquiryToSnake,
@@ -28,6 +29,7 @@ import type {
   Inquiry,
   InquiryNote,
   InquiryStatus,
+  ImageType,
   LocalStore,
   PaymentEvent,
   Profile,
@@ -59,6 +61,7 @@ function localCards(store: LocalStore, filters: Partial<CardFilters> = {}): Card
     return (!filters.graders || filters.graders.includes(card.grader))
       && (!filters.grades || filters.grades.includes(card.grade))
       && (!filters.availability || filters.availability.includes(card.availabilityStatus))
+      && (!filters.publicationStatus || filters.publicationStatus.includes(card.publicationStatus))
       && (!filters.languages || filters.languages.includes(card.language))
       && (!filters.sets || (card.setName !== null && filters.sets.includes(card.setName)))
       && (!filters.rarities || (card.rarity !== null && filters.rarities.includes(card.rarity)))
@@ -99,6 +102,7 @@ export async function getCards(filters: Partial<CardFilters> = {}): Promise<{ it
   if (filters.q) query = query.or(`title.ilike.%${filters.q}%,pokemon_name.ilike.%${filters.q}%,certification_number.ilike.%${filters.q}%`);
   if (filters.graders?.length) query = query.in("grader", filters.graders);
   if (filters.availability?.length) query = query.in("availability_status", filters.availability);
+  if (filters.publicationStatus?.length) query = query.in("publication_status", filters.publicationStatus);
   if (filters.featured !== undefined) query = query.eq("featured", filters.featured);
   if (filters.minPriceMinor !== undefined) query = query.gte("price_minor", filters.minPriceMinor);
   if (filters.maxPriceMinor !== undefined) query = query.lte("price_minor", filters.maxPriceMinor);
@@ -142,6 +146,44 @@ export async function updateCard(id: string, input: CardUpdateInput, actorId: st
   const card = snakeToCard(asRecord(data)); await appendAuditLog({ actorId, action: "UPDATE", entityType: "CARD", entityId: id, beforeState: before, afterState: card }); return card;
 }
 export async function archiveCard(id: string, actorId: string) { return transitionInventory(id, "ARCHIVED", actorId); }
+export async function replaceCardImages(
+  cardId: string,
+  images: Array<Pick<CardImage, "imageUrl" | "storagePath" | "imageType" | "altText" | "sortOrder" | "width" | "height">>,
+  actorId: string,
+): Promise<CardImage[]> {
+  await assertAdmin(actorId);
+  if (!await getCardById(cardId)) throw new NotFoundError("Card not found.");
+  const now = isoNow();
+  const normalized = images.map((image, index): CardImage => ({
+    id: uuid(),
+    cardId,
+    imageUrl: image.imageUrl,
+    storagePath: image.storagePath ?? null,
+    imageType: image.imageType as ImageType,
+    altText: image.altText ?? null,
+    sortOrder: index,
+    width: image.width ?? null,
+    height: image.height ?? null,
+    createdAt: now,
+  }));
+  if (!env.isSupabaseConfigured) {
+    return updateStore((store) => {
+      store.cardImages = store.cardImages.filter((image) => image.cardId !== cardId);
+      store.cardImages.push(...normalized);
+      store.auditLogs.push(makeAudit(actorId, "REPLACE_IMAGES", "CARD", cardId, null, { count: normalized.length }));
+      return normalized;
+    });
+  }
+  const db = createAdminClient();
+  const { error: deleteError } = await db.from("card_images").delete().eq("card_id", cardId);
+  if (deleteError) throw deleteError;
+  if (normalized.length) {
+    const { error: insertError } = await db.from("card_images").insert(normalized.map(cardImageToSnake));
+    if (insertError) throw insertError;
+  }
+  await appendAuditLog({ actorId, action: "REPLACE_IMAGES", entityType: "CARD", entityId: cardId, beforeState: null, afterState: { count: normalized.length } });
+  return normalized;
+}
 export async function bulkSetFeatured(ids: string[], featured: boolean, actorId: string): Promise<void> { await assertAdmin(actorId); if (!env.isSupabaseConfigured) { await updateStore((store) => { store.cards.forEach((card) => { if (ids.includes(card.id)) card.featured = featured; }); }); } else { const { error } = await createAdminClient().from("cards").update({ featured }).in("id", ids); if (error) throw error; } await appendAuditLog({ actorId, action: featured ? "SET_FEATURED" : "CLEAR_FEATURED", entityType: "CARD", entityId: null, beforeState: null, afterState: { ids } }); }
 export async function bulkArchive(ids: string[], actorId: string): Promise<void> { for (const id of ids) await archiveCard(id, actorId); }
 
