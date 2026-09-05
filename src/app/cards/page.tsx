@@ -6,7 +6,8 @@ import { CatalogFilters } from "@/components/cards/catalog-filters";
 import { CatalogGrid, CatalogGridSkeleton } from "@/components/cards/catalog-grid";
 import { Container } from "@/components/layout/container";
 import { SectionHeading } from "@/components/layout/section-heading";
-import { getCards } from "@/lib/data/repository";
+import { getCurrentUser } from "@/lib/auth/session";
+import { getCards, getFavorites } from "@/lib/data/repository";
 import { cardFiltersSchema } from "@/lib/validations/card";
 
 export const metadata: Metadata = { title: "Collection", description: "Browse the private Atelier Graded collection.", openGraph: { title: "The Collection | Atelier Graded", description: "A considered selection of graded collectibles." } };
@@ -16,12 +17,13 @@ async function Results({ searchParams }: { searchParams: Promise<Search> }) {
   const raw = await searchParams;
   const parsed = cardFiltersSchema.safeParse(raw);
   const filters = parsed.success ? parsed.data : cardFiltersSchema.parse({});
-  const result = await getCards(filters);
+  const [result, user] = await Promise.all([getCards(filters), getCurrentUser()]);
+  const favorites = user ? await getFavorites(user.id) : [];
   const items = result.items.filter((card) => card.publicationStatus === "PUBLISHED");
   const { total, page, perPage } = { ...result, total: result.items.filter((card) => card.publicationStatus === "PUBLISHED").length };
   const pages = Math.ceil(total / perPage);
   const makePage = (next: number) => { const params = new URLSearchParams(); Object.entries(raw).forEach(([key, value]) => params.set(key, Array.isArray(value) ? value.join(",") : value ?? "")); params.set("page", String(next)); return `/cards?${params}`; };
-  return <><p className="mb-6 text-sm text-muted-foreground">{total} {total === 1 ? "piece" : "pieces"} in the catalogue</p><CatalogGrid cards={items} />{pages > 1 && <nav className="mt-10 flex justify-center gap-4" aria-label="Catalog pagination">{page > 1 && <Link className="border border-border px-4 py-2 text-sm hover:border-gold" href={makePage(page - 1)}>Previous</Link>}<span className="px-4 py-2 text-sm text-muted-foreground">Page {page} of {pages}</span>{page < pages && <Link className="border border-border px-4 py-2 text-sm hover:border-gold" href={makePage(page + 1)}>Next</Link>}</nav>}</>;
+  return <><p className="mb-6 text-sm text-muted-foreground">{total} {total === 1 ? "piece" : "pieces"} in the catalogue</p><CatalogGrid cards={items} userId={user?.id} favoriteCardIds={favorites.map((card) => card.id)} />{pages > 1 && <nav className="mt-10 flex justify-center gap-4" aria-label="Catalog pagination">{page > 1 && <Link className="border border-border px-4 py-2 text-sm hover:border-gold" href={makePage(page - 1)}>Previous</Link>}<span className="px-4 py-2 text-sm text-muted-foreground">Page {page} of {pages}</span>{page < pages && <Link className="border border-border px-4 py-2 text-sm hover:border-gold" href={makePage(page + 1)}>Next</Link>}</nav>}</>;
 }
 
 export default async function CardsPage({ searchParams }: { searchParams: Promise<Search> }) {
