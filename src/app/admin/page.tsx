@@ -6,6 +6,7 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { getDashboardData } from "@/app/actions/admin";
 import { getAllInquiries, getCards } from "@/lib/data/repository";
 import { formatPrice } from "@/lib/utils";
+import type { AuditLog, Inquiry } from "@/types/database";
 
 const date = (value: string) => new Intl.DateTimeFormat("en", { month: "short", day: "numeric", year: "numeric" }).format(new Date(value));
 
@@ -19,7 +20,7 @@ export default async function AdminDashboardPage() {
   const { stats, auditLogs } = dashboard;
   const archived = stats.totalCards - stats.availableCards - stats.reservedCards - stats.soldCards;
   const activeListings = stats.availableCards + stats.reservedCards;
-  const conversions = allInquiries.items.filter((inquiry) => inquiry.status === "ACCEPTED" || inquiry.status === "CONVERTED_TO_ORDER").length;
+  const conversions = allInquiries.items.filter((inquiry: Inquiry) => inquiry.status === "ACCEPTED" || inquiry.status === "CONVERTED_TO_ORDER").length;
   const conversionRate = allInquiries.total ? Math.round((conversions / allInquiries.total) * 100) : 0;
   const metrics = [
     { label: "Active listings", value: activeListings, hint: `${stats.availableCards} available`, icon: PackageOpen },
@@ -48,7 +49,7 @@ export default async function AdminDashboardPage() {
         <Card><CardHeader className="flex-row items-center justify-between"><div><CardTitle>Recently sold</CardTitle><p className="mt-1 text-sm text-muted-foreground">Latest completed inventory changes.</p></div><Link href="/admin/cards?availability=SOLD" className="text-sm font-bold text-gold">Sold cards</Link></CardHeader><CardContent className="space-y-3">{recentSold.items.length ? recentSold.items.map((card) => <div key={card.id} className="flex items-center justify-between rounded-md border border-border px-3 py-3"><div className="min-w-0"><p className="truncate text-sm font-semibold">{card.title}</p><p className="mt-1 text-xs text-muted-foreground">Sold {card.soldAt ? date(card.soldAt) : "recently"}</p></div><span className="text-sm font-bold text-gold">{formatPrice(card.priceMinor, card.currency)}</span></div>) : <p className="py-6 text-sm text-muted-foreground">No sold cards yet.</p>}</CardContent></Card>
       </div>
 
-      <Card><CardHeader><CardTitle>Activity</CardTitle><p className="mt-1 text-sm text-muted-foreground">Recent administrative actions across inventory, inquiries, and settings.</p></CardHeader><CardContent className="space-y-2">{auditLogs.length ? auditLogs.map((log) => <div key={log.id} className="flex gap-3 rounded-md px-2 py-2.5"><Clock3 className="mt-0.5 size-4 shrink-0 text-gold" /><p className="flex-1 text-sm"><span className="font-semibold">{log.action.replaceAll("_", " ").toLowerCase()}</span> <span className="text-muted-foreground">on {log.entityType.toLowerCase()}{log.entityId ? ` ${log.entityId.slice(0, 8)}` : ""}</span></p><time className="shrink-0 text-xs text-muted-foreground">{date(log.createdAt)}</time></div>) : <p className="py-4 text-sm text-muted-foreground">Administrative activity will appear here.</p>}</CardContent></Card>
+      <Card><CardHeader><CardTitle>Activity</CardTitle><p className="mt-1 text-sm text-muted-foreground">Recent administrative actions across inventory, inquiries, and settings.</p></CardHeader><CardContent className="space-y-2">{auditLogs.length ? auditLogs.map((log: AuditLog) => <div key={log.id} className="flex gap-3 rounded-md px-2 py-2.5"><Clock3 className="mt-0.5 size-4 shrink-0 text-gold" /><p className="flex-1 text-sm"><span className="font-semibold">{log.action.replaceAll("_", " ").toLowerCase()}</span> <span className="text-muted-foreground">on {log.entityType.toLowerCase()}{log.entityId ? ` ${log.entityId.slice(0, 8)}` : ""}</span></p><time className="shrink-0 text-xs text-muted-foreground">{date(log.createdAt)}</time></div>) : <p className="py-4 text-sm text-muted-foreground">Administrative activity will appear here.</p>}</CardContent></Card>
     </div>
   );
 }
