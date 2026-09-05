@@ -44,15 +44,6 @@ export function CatalogGrid({
     </div>
   );
 }
-import type { CardWithImages } from "@/types/database";
-import { CatalogCard } from "@/components/cards/catalog-card";
-
-export function CatalogGrid({ cards, className = "" }: { cards: CardWithImages[]; className?: string }) {
-  if (!cards.length) {
-    return <div className="border border-dashed border-border py-20 text-center"><p className="font-display text-3xl">No cards found</p><p className="mt-2 text-sm text-muted-foreground">Try clearing a filter or returning to the full collection.</p></div>;
-  }
-  return <div className={`grid gap-5 sm:grid-cols-2 lg:grid-cols-3 ${className}`}>{cards.map((card) => <CatalogCard key={card.id} card={card} />)}</div>;
-}
 
 export function CatalogGridSkeleton() {
   return <div className="grid gap-5 sm:grid-cols-2 lg:grid-cols-3">{Array.from({ length: 6 }, (_, index) => <div key={index} className="animate-pulse border border-border bg-card"><div className="aspect-[4/5] bg-muted" /><div className="space-y-3 p-5"><div className="h-3 w-1/3 bg-muted" /><div className="h-7 w-4/5 bg-muted" /><div className="h-4 w-1/2 bg-muted" /></div></div>)}</div>;

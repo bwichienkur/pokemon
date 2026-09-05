@@ -123,35 +123,3 @@ export function CatalogCard({
     </article>
   );
 }
-"use client";
-
-import Image from "next/image";
-import Link from "next/link";
-
-import type { CardWithImages } from "@/types/database";
-
-const money = (amount: number, currency: string) =>
-  new Intl.NumberFormat("en-US", { style: "currency", currency, maximumFractionDigits: 0 }).format(amount / 100);
-
-export function CatalogCard({ card }: { card: CardWithImages }) {
-  const image = card.images[0];
-  return (
-    <article className="group overflow-hidden border border-border bg-card transition duration-500 hover:-translate-y-1 hover:border-gold/50">
-      <Link href={`/cards/${card.slug}`} className="block focus-visible:outline-none">
-        <div className="slab-glare relative aspect-[4/5] overflow-hidden bg-[#171b23]">
-          {image ? <Image src={image.imageUrl} alt={image.altText ?? card.title} fill className="object-cover p-5 transition duration-700 group-hover:scale-[1.03]" /> : null}
-          <span className="absolute left-3 top-3 z-10 border border-gold/30 bg-background/80 px-2 py-1 text-[10px] font-bold uppercase tracking-[0.16em] text-gold">{card.grader} {card.grade}</span>
-          {card.availabilityStatus !== "AVAILABLE" && <span className="absolute right-3 top-3 z-10 bg-background/85 px-2 py-1 text-[10px] font-bold uppercase tracking-[0.16em] text-muted-foreground">{card.availabilityStatus}</span>}
-        </div>
-        <div className="p-5">
-          <p className="text-[10px] font-bold uppercase tracking-[0.17em] text-muted-foreground">{card.year ?? "—"} · {card.setName ?? "Uncatalogued"}</p>
-          <h3 className="mt-2 font-display text-2xl leading-none text-foreground">{card.title.replace(/^DEMO Inventory — /, "")}</h3>
-          <div className="mt-5 flex items-end justify-between gap-3">
-            <p className="text-sm font-semibold text-gold">{card.availabilityStatus === "SOLD" ? "Sold" : money(card.priceMinor, card.currency)}</p>
-            <p className="text-xs text-muted-foreground">{card.certificationNumber}</p>
-          </div>
-        </div>
-      </Link>
-    </article>
-  );
-}
