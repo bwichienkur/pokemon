@@ -1,12 +1,29 @@
 <svg xmlns="http://www.w3.org/2000/svg" width="800" height="1120" viewBox="0 0 800 1120" role="img" aria-labelledby="title desc">
-  <title id="title">Demo graded card slab placeholder, front</title>
-  <desc id="desc">A neutral placeholder for a fictional graded card listing.</desc>
-  <rect width="800" height="1120" fill="#0f172a"/>
-  <rect x="55" y="40" width="690" height="1040" rx="34" fill="#e2e8f0" stroke="#94a3b8" stroke-width="12"/>
-  <rect x="95" y="90" width="610" height="150" rx="14" fill="#d4af37"/>
-  <text x="400" y="165" text-anchor="middle" font-family="system-ui, sans-serif" font-size="42" font-weight="700" fill="#172033">ATELIER GRADED</text>
-  <rect x="110" y="275" width="580" height="620" rx="18" fill="#334155"/>
-  <circle cx="400" cy="570" r="175" fill="#64748b"/>
-  <text x="400" y="585" text-anchor="middle" font-family="system-ui, sans-serif" font-size="38" fill="#f8fafc">DEMO</text>
-  <text x="400" y="960" text-anchor="middle" font-family="system-ui, sans-serif" font-size="28" fill="#334155">FICTIONAL INVENTORY</text>
+  <title id="title">Demo Graded card slab placeholder, front</title>
+  <desc id="desc">A premium charcoal and gold fictional graded trading card slab.</desc>
+  <defs>
+    <linearGradient id="body" x1="0" x2="1" y1="0" y2="1"><stop stop-color="#36404c"/><stop offset=".45" stop-color="#d3d7d9"/><stop offset="1" stop-color="#56616c"/></linearGradient>
+    <linearGradient id="label" x1="0" x2="1"><stop stop-color="#8c6c2d"/><stop offset=".45" stop-color="#e0c274"/><stop offset="1" stop-color="#a47d35"/></linearGradient>
+    <radialGradient id="art"><stop stop-color="#628d9e"/><stop offset=".5" stop-color="#172839"/><stop offset="1" stop-color="#0a0e16"/></radialGradient>
+    <filter id="shadow"><feDropShadow dx="0" dy="24" stdDeviation="22" flood-opacity=".48"/></filter>
+  </defs>
+  <rect width="800" height="1120" rx="44" fill="#07080b"/>
+  <g filter="url(#shadow)">
+    <rect x="55" y="35" width="690" height="1050" rx="34" fill="url(#body)" stroke="#e4e8e9" stroke-width="7"/>
+    <rect x="73" y="54" width="654" height="1012" rx="23" fill="none" stroke="#18212b" stroke-opacity=".52" stroke-width="7"/>
+    <rect x="98" y="89" width="604" height="162" rx="11" fill="url(#label)" stroke="#f3dc9a" stroke-width="3"/>
+    <text x="130" y="132" font-family="Georgia, serif" font-size="18" letter-spacing="3" fill="#101317">DEMO GRADED</text>
+    <text x="130" y="174" font-family="Georgia, serif" font-size="28" font-weight="700" fill="#101317">EXHIBITION SERIES</text>
+    <text x="130" y="211" font-family="system-ui, sans-serif" font-size="15" letter-spacing="1.4" fill="#2b2415">FICTIONAL COLLECTIBLE • 2026</text>
+    <text x="662" y="189" text-anchor="end" font-family="Georgia, serif" font-size="60" font-weight="700" fill="#101317">10</text>
+    <rect x="113" y="282" width="574" height="634" rx="12" fill="url(#art)" stroke="#0b111a" stroke-width="9"/>
+    <path d="M198 736C292 510 481 423 611 526c-36 153-141 263-327 271-77 4-124-14-86-61Z" fill="#b79b54" fill-opacity=".65"/>
+    <circle cx="402" cy="553" r="121" fill="none" stroke="#bddce0" stroke-opacity=".42" stroke-width="7"/>
+    <path d="M222 444c94-80 283-90 364 43" fill="none" stroke="#d4af37" stroke-opacity=".45" stroke-width="5"/>
+    <text x="400" y="840" text-anchor="middle" font-family="Georgia, serif" font-size="26" fill="#f6f2e6">PRIVATE COLLECTION</text>
+    <rect x="118" y="949" width="564" height="77" rx="8" fill="#e5e7e8" fill-opacity=".82"/>
+    <text x="146" y="982" font-family="system-ui, sans-serif" font-size="14" letter-spacing="2" fill="#202a32">CERTIFIED • 00102846</text>
+    <text x="146" y="1008" font-family="system-ui, sans-serif" font-size="12" letter-spacing="1.2" fill="#59616a">DEMONSTRATION LABEL — NOT A GRADING COMPANY</text>
+  </g>
+  <path d="M128 115C263 55 440 66 665 115" fill="none" stroke="#fff" stroke-opacity=".24" stroke-width="12" stroke-linecap="round"/>
 </svg>

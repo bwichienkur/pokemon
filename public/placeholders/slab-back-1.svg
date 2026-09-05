@@ -1,10 +1,30 @@
 <svg xmlns="http://www.w3.org/2000/svg" width="800" height="1120" viewBox="0 0 800 1120" role="img" aria-labelledby="title desc">
-  <title id="title">Demo graded card slab placeholder, back</title>
-  <desc id="desc">The reverse of a neutral placeholder for a fictional graded card listing.</desc>
-  <rect width="800" height="1120" fill="#0f172a"/>
-  <rect x="55" y="40" width="690" height="1040" rx="34" fill="#e2e8f0" stroke="#94a3b8" stroke-width="12"/>
-  <rect x="100" y="105" width="600" height="900" rx="24" fill="#475569"/>
-  <path d="M160 225h480M160 315h480M160 405h480M160 495h480M160 585h480M160 675h480M160 765h480" stroke="#94a3b8" stroke-width="18" stroke-linecap="round"/>
-  <text x="400" y="900" text-anchor="middle" font-family="system-ui, sans-serif" font-size="32" font-weight="700" fill="#f8fafc">DEMO BACK</text>
-  <text x="400" y="960" text-anchor="middle" font-family="system-ui, sans-serif" font-size="24" fill="#cbd5e1">FICTIONAL INVENTORY</text>
+  <title id="title">Demo Graded card slab placeholder, back</title>
+  <desc id="desc">The reverse of a premium fictional graded trading card slab.</desc>
+  <defs>
+    <linearGradient id="body" x1="0" x2="1" y1="0" y2="1"><stop stop-color="#36404c"/><stop offset=".45" stop-color="#d3d7d9"/><stop offset="1" stop-color="#56616c"/></linearGradient>
+    <linearGradient id="field" x1="0" x2="0" y2="1"><stop stop-color="#132130"/><stop offset="1" stop-color="#0b1018"/></linearGradient>
+    <filter id="shadow"><feDropShadow dx="0" dy="24" stdDeviation="22" flood-opacity=".48"/></filter>
+  </defs>
+  <rect width="800" height="1120" rx="44" fill="#07080b"/>
+  <g filter="url(#shadow)">
+    <rect x="55" y="35" width="690" height="1050" rx="34" fill="url(#body)" stroke="#e4e8e9" stroke-width="7"/>
+    <rect x="73" y="54" width="654" height="1012" rx="23" fill="none" stroke="#18212b" stroke-opacity=".52" stroke-width="7"/>
+    <rect x="108" y="92" width="584" height="917" rx="16" fill="url(#field)" stroke="#0c121a" stroke-width="8"/>
+    <rect x="137" y="125" width="526" height="114" rx="8" fill="#1b2937" stroke="#c6a75e" stroke-opacity=".66" stroke-width="2"/>
+    <text x="400" y="167" text-anchor="middle" font-family="Georgia, serif" font-size="23" letter-spacing="4" fill="#d8bb70">DEMO GRADED</text>
+    <text x="400" y="202" text-anchor="middle" font-family="system-ui, sans-serif" font-size="12" letter-spacing="2" fill="#bec9cc">VERIFIED ARCHIVE</text>
+    <path d="M159 305h482M159 383h482M159 461h482M159 539h482M159 617h482M159 695h482M159 773h482" stroke="#415161" stroke-width="2"/>
+    <path d="M202 273v530M598 273v530" stroke="#334250" stroke-width="2"/>
+    <g fill="#9bb0b8" font-family="system-ui, sans-serif" font-size="15" letter-spacing="1.5">
+      <text x="178" y="336">COLLECTION</text><text x="222" y="336" fill="#e6edf0">EXHIBITION SERIES</text>
+      <text x="178" y="414">CERTIFICATION</text><text x="222" y="414" fill="#e6edf0">00102846</text>
+      <text x="178" y="492">GRADE</text><text x="222" y="492" fill="#d8bb70">GEM 10</text>
+      <text x="178" y="570">FINISH</text><text x="222" y="570" fill="#e6edf0">HOLOGRAPHIC</text>
+      <text x="178" y="648">STATUS</text><text x="222" y="648" fill="#e6edf0">DEMONSTRATION</text>
+    </g>
+    <rect x="137" y="849" width="526" height="104" rx="8" fill="#101820" stroke="#455565" stroke-width="2"/>
+    <path d="M190 887h420M190 910h280M190 933h366" stroke="#7f9199" stroke-width="7" stroke-linecap="round"/>
+  </g>
+  <path d="M128 115C263 55 440 66 665 115" fill="none" stroke="#fff" stroke-opacity=".24" stroke-width="12" stroke-linecap="round"/>
 </svg>
