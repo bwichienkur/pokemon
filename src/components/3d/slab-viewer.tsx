@@ -94,6 +94,7 @@ export function SlabViewer({
             rotation={rotation}
             scale={scale}
             enablePointerTilt={false}
+            cinematic
             className="min-h-0"
           />
         )}
