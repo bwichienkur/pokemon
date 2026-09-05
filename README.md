@@ -90,6 +90,22 @@ npm run db:migrate   # Apply project migration helper
 npm run db:seed      # Seed Supabase or the local fallback store
 ```
 
+## Deploying on Vercel
+
+1. Import the GitHub repository in Vercel (Framework Preset: **Next.js**, Node.js **20+**).
+2. Do **not** leave half-configured Supabase values in the Vercel project env. Either set all of
+   `NEXT_PUBLIC_SUPABASE_URL`, `NEXT_PUBLIC_SUPABASE_ANON_KEY`, and `SUPABASE_SERVICE_ROLE_KEY`,
+   or leave all three empty for the built-in demo store.
+3. Set `NEXT_PUBLIC_SITE_URL` to your production URL (for example `https://your-app.vercel.app`).
+   If omitted, the app falls back to `VERCEL_URL`.
+4. Optional: `RESEND_API_KEY`, `EMAIL_FROM`, and `ADMIN_EMAIL` for inquiry notifications.
+5. Deploy. The install uses `npm ci` with `.npmrc` `legacy-peer-deps=true` so peer conflicts from
+   tooling packages cannot fail the build.
+
+For a durable production catalogue, configure Supabase (migrations, public `card-images` bucket,
+and RLS) before go-live. Without Supabase, Vercel serves the seeded demo catalogue from memory;
+demo login adapters stay disabled when `NODE_ENV=production`.
+
 ## Architecture
 
 The repository layer supports two modes. With complete Supabase configuration it uses Supabase
