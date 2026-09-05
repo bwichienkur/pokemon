@@ -12,6 +12,7 @@ let adminClient: ReturnType<typeof createClient> | undefined;
  */
 // The project intentionally has no generated Supabase Database type yet.
 // Keep the privileged repository adapter flexible until generation is added.
+// eslint-disable-next-line @typescript-eslint/no-explicit-any -- Supabase schema types are not generated.
 export function createAdminClient(): any {
   if (
     !env.isSupabaseConfigured ||

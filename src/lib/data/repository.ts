@@ -25,7 +25,6 @@ import type {
   AvailabilityStatus,
   Card,
   CardWithImages,
-  Favorite,
   Inquiry,
   InquiryNote,
   InquiryStatus,
