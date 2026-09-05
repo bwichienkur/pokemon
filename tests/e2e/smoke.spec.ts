@@ -21,7 +21,9 @@ test("collector and administrator smoke flow", async ({ browser, page }) => {
 
   await page.getByRole("link", { name: /view demo inventory/i }).first().click();
   await page.getByLabel("Name").fill("Demo Collector");
-  await page.getByLabel("Email").fill("collector@ateliergraded.demo");
+  await page
+    .getByRole("textbox", { name: "Email", exact: true })
+    .fill("collector@ateliergraded.demo");
   await page.getByLabel("Country").fill("United States");
   await page
     .getByLabel("Message")
