@@ -8,7 +8,9 @@ import { NewsletterForm } from "@/components/layout/newsletter-form";
 import { SectionHeading } from "@/components/layout/section-heading";
 import { getFeaturedCards, getNewArrivals, getSoldCards } from "@/lib/data/repository";
 
-const HeroSlab = dynamic(() => import("@/components/3d/hero-slab").then((module) => module.HeroSlab));
+const HeroSlab = dynamic(() =>
+  import("@/components/3d/hero-slab").then((module) => module.HeroSlab),
+);
 
 export default async function Home() {
   const [featured, arrivals, sold] = await Promise.all([getFeaturedCards(3), getNewArrivals(3), getSoldCards(3)]);

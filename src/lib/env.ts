@@ -3,28 +3,39 @@ import { z } from "zod";
 const emptyToUndefined = (value: unknown) =>
   typeof value === "string" && value.trim() === "" ? undefined : value;
 
-const optionalUrl = z.preprocess(emptyToUndefined, z.string().url().optional());
+function coerceOptionalUrl(value: unknown, label: string): string | undefined {
+  const normalized = emptyToUndefined(value);
+  if (typeof normalized !== "string") return undefined;
+  const candidate = normalized.includes("://") ? normalized : `https://${normalized}`;
+  try {
+    const parsed = new URL(candidate);
+    if (parsed.protocol !== "http:" && parsed.protocol !== "https:") {
+      console.warn(`[atelier-graded] Ignoring ${label}: unsupported protocol.`);
+      return undefined;
+    }
+    return parsed.toString().replace(/\/$/, "");
+  } catch {
+    console.warn(`[atelier-graded] Ignoring invalid ${label}: ${normalized}`);
+    return undefined;
+  }
+}
+
 const optionalString = z.preprocess(emptyToUndefined, z.string().min(1).optional());
 const optionalEmail = z.preprocess(emptyToUndefined, z.string().email().optional());
 
-function resolveSiteUrl(): string | undefined {
-  const configured = emptyToUndefined(process.env.NEXT_PUBLIC_SITE_URL);
-  if (typeof configured === "string") return configured;
-  const vercelUrl = emptyToUndefined(process.env.VERCEL_URL);
-  if (typeof vercelUrl === "string") {
-    return vercelUrl.startsWith("http") ? vercelUrl : `https://${vercelUrl}`;
-  }
-  return undefined;
+function resolveSiteUrl(): string {
+  return (
+    coerceOptionalUrl(process.env.NEXT_PUBLIC_SITE_URL, "NEXT_PUBLIC_SITE_URL") ??
+    coerceOptionalUrl(process.env.VERCEL_URL, "VERCEL_URL") ??
+    "http://localhost:3000"
+  );
 }
 
 const environmentSchema = z.object({
-  NEXT_PUBLIC_SUPABASE_URL: optionalUrl,
+  NEXT_PUBLIC_SUPABASE_URL: z.string().url().optional(),
   NEXT_PUBLIC_SUPABASE_ANON_KEY: optionalString,
   SUPABASE_SERVICE_ROLE_KEY: optionalString,
-  NEXT_PUBLIC_SITE_URL: z.preprocess(
-    emptyToUndefined,
-    z.string().url().default("http://localhost:3000"),
-  ),
+  NEXT_PUBLIC_SITE_URL: z.string().url(),
   RESEND_API_KEY: optionalString,
   EMAIL_FROM: optionalString,
   ADMIN_EMAIL: optionalEmail,
@@ -49,7 +60,10 @@ const environmentSchema = z.object({
 });
 
 const parsed = environmentSchema.safeParse({
-  NEXT_PUBLIC_SUPABASE_URL: process.env.NEXT_PUBLIC_SUPABASE_URL,
+  NEXT_PUBLIC_SUPABASE_URL: coerceOptionalUrl(
+    process.env.NEXT_PUBLIC_SUPABASE_URL,
+    "NEXT_PUBLIC_SUPABASE_URL",
+  ),
   NEXT_PUBLIC_SUPABASE_ANON_KEY: process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY,
   SUPABASE_SERVICE_ROLE_KEY: process.env.SUPABASE_SERVICE_ROLE_KEY,
   NEXT_PUBLIC_SITE_URL: resolveSiteUrl(),
@@ -64,16 +78,26 @@ const parsed = environmentSchema.safeParse({
 });
 
 if (!parsed.success) {
-  throw new Error(
-    `Invalid environment configuration: ${parsed.error.issues
+  // Never crash the Vercel build for optional/badly pasted dashboard values.
+  console.warn(
+    `[atelier-graded] Environment validation issues (continuing with safe defaults): ${parsed.error.issues
       .map((issue) => `${issue.path.join(".")}: ${issue.message}`)
       .join("; ")}`,
   );
 }
 
-const values = parsed.data;
+const values = parsed.success
+  ? parsed.data
+  : environmentSchema.parse({
+      NEXT_PUBLIC_SITE_URL: resolveSiteUrl(),
+      DIRECT_CHECKOUT_ENABLED: false,
+    });
+
 const hasSupabaseUrl = Boolean(values.NEXT_PUBLIC_SUPABASE_URL);
 const hasSupabaseAnonKey = Boolean(values.NEXT_PUBLIC_SUPABASE_ANON_KEY);
+const supabaseReady = hasSupabaseUrl && hasSupabaseAnonKey;
+const adminSeedReady =
+  Boolean(values.ADMIN_SEED_EMAIL) && Boolean(values.ADMIN_SEED_PASSWORD);
 
 if (hasSupabaseUrl !== hasSupabaseAnonKey) {
   console.warn(
@@ -87,20 +111,12 @@ if (Boolean(values.ADMIN_SEED_EMAIL) !== Boolean(values.ADMIN_SEED_PASSWORD)) {
   );
 }
 
-const supabaseReady = hasSupabaseUrl && hasSupabaseAnonKey;
-
 export const env = {
   ...values,
   NEXT_PUBLIC_SUPABASE_URL: supabaseReady ? values.NEXT_PUBLIC_SUPABASE_URL : undefined,
   NEXT_PUBLIC_SUPABASE_ANON_KEY: supabaseReady ? values.NEXT_PUBLIC_SUPABASE_ANON_KEY : undefined,
-  ADMIN_SEED_EMAIL:
-    Boolean(values.ADMIN_SEED_EMAIL) && Boolean(values.ADMIN_SEED_PASSWORD)
-      ? values.ADMIN_SEED_EMAIL
-      : undefined,
-  ADMIN_SEED_PASSWORD:
-    Boolean(values.ADMIN_SEED_EMAIL) && Boolean(values.ADMIN_SEED_PASSWORD)
-      ? values.ADMIN_SEED_PASSWORD
-      : undefined,
+  ADMIN_SEED_EMAIL: adminSeedReady ? values.ADMIN_SEED_EMAIL : undefined,
+  ADMIN_SEED_PASSWORD: adminSeedReady ? values.ADMIN_SEED_PASSWORD : undefined,
   isSupabaseConfigured: supabaseReady,
 } as const;
 
